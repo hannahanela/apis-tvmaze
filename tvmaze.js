@@ -20,38 +20,32 @@ const searchTerm = $("#searchForm-term").val();
 
 async function getShowsByTerm(keyword) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
-  const axiosObj = await axios.get(TV_MAZE_SEARCH_URL, {params: {q: keyword}});
-  const showID = axiosObj.data[0].show.id;
-  const showName = axiosObj.data[0].show.name;
-  const showSummary = axiosObj.data[0].show.summary;
-  const showImage = axiosObj.data[0].show.image.medium;
-  return [
-    {
-      id: showID,
-      name: showName,
-      summary: showSummary,
-      image: showImage
-    }
-  ]
 
-  // return [
-  //   {
-  //     id: 1767,
-  //     name: "The Bletchley Circle",
-  //     summary:
-  //       `<p><b>The Bletchley Circle</b> follows the journey of four ordinary 
-  //          women with extraordinary skills that helped to end World War II.</p>
-  //        <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their 
-  //          normal lives, modestly setting aside the part they played in 
-  //          producing crucial intelligence, which helped the Allies to victory 
-  //          and shortened the war. When Susan discovers a hidden code behind an
-  //          unsolved murder she is met by skepticism from the police. She 
-  //          quickly realises she can only begin to crack the murders and bring
-  //          the culprit to justice with her former friends.</p>`,
-  //     image:
-  //         "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
-  //   }
-  // ]
+  const axiosObj = await axios.get(TV_MAZE_SEARCH_URL, { params: { q: keyword } });
+
+  return axiosObj.data.map(idx => getShowInformation(idx));
+}
+
+function getShowInformation(show) {
+
+  const showID = show.show.id
+  const showName = show.show.name;
+  const showSummary = show.show.summary;
+  let showImage;
+
+  if (show.show.image === undefined) {
+    showImage = "https://tinyurl.com/tv-missing";
+  } else {
+    showImage = show.show.image.original;
+  }
+
+  return {
+    id: showID,
+    name: showName,
+    summary: showSummary,
+    image: showImage
+  }
+
 }
 
 
@@ -62,10 +56,10 @@ function populateShows(shows) {
 
   for (let show of shows) {
     const $show = $(
-        `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img 
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg" 
+              src="${show.image}" 
               alt="Bletchly Circle San Francisco" 
               class="w-25 me-3">
            <div class="media-body">
@@ -79,7 +73,8 @@ function populateShows(shows) {
        </div>
       `);
 
-    $showsList.append($show);  }
+    $showsList.append($show);
+  }
 }
 
 
