@@ -1,9 +1,11 @@
 "use strict";
 
+const TV_MAZE_SEARCH_URL = "https://api.tvmaze.com/search/shows?";
+
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
-
+const searchTerm = $("#searchForm-term").val();
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -12,27 +14,44 @@ const $searchForm = $("#searchForm");
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm( /* term */) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
+// use keyword, to match name of show
+// pull information for show
+// append and display on html
 
+async function getShowsByTerm(keyword) {
+  // ADD: Remove placeholder & make request to TVMaze search shows API.
+  const axiosObj = await axios.get(TV_MAZE_SEARCH_URL, {params: {q: keyword}});
+  const showID = axiosObj.data[0].show.id;
+  const showName = axiosObj.data[0].show.name;
+  const showSummary = axiosObj.data[0].show.summary;
+  const showImage = axiosObj.data[0].show.image.medium;
   return [
     {
-      id: 1767,
-      name: "The Bletchley Circle",
-      summary:
-        `<p><b>The Bletchley Circle</b> follows the journey of four ordinary 
-           women with extraordinary skills that helped to end World War II.</p>
-         <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their 
-           normal lives, modestly setting aside the part they played in 
-           producing crucial intelligence, which helped the Allies to victory 
-           and shortened the war. When Susan discovers a hidden code behind an
-           unsolved murder she is met by skepticism from the police. She 
-           quickly realises she can only begin to crack the murders and bring
-           the culprit to justice with her former friends.</p>`,
-      image:
-          "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
+      id: showID,
+      name: showName,
+      summary: showSummary,
+      image: showImage
     }
   ]
+
+  // return [
+  //   {
+  //     id: 1767,
+  //     name: "The Bletchley Circle",
+  //     summary:
+  //       `<p><b>The Bletchley Circle</b> follows the journey of four ordinary 
+  //          women with extraordinary skills that helped to end World War II.</p>
+  //        <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their 
+  //          normal lives, modestly setting aside the part they played in 
+  //          producing crucial intelligence, which helped the Allies to victory 
+  //          and shortened the war. When Susan discovers a hidden code behind an
+  //          unsolved murder she is met by skepticism from the police. She 
+  //          quickly realises she can only begin to crack the murders and bring
+  //          the culprit to justice with her former friends.</p>`,
+  //     image:
+  //         "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
+  //   }
+  // ]
 }
 
 
