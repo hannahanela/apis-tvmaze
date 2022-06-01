@@ -16,7 +16,6 @@ const searchTerm = $("#searchForm-term").val();
  */
 
 async function getShowsByTerm(keyword) {
-
   const searchResults = await axios.get(TV_MAZE_SEARCH_URL, { params: { q: keyword } });
   const showList = searchResults.data;
   return showList.map(show => getShowInformation(show));
@@ -58,7 +57,7 @@ function populateShows(shows) {
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
              <div><small>${show.summary}</small></div>
-             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+             <button class="btn btn-outline-light btn-sm Show-getEpisodes" id="episodes-btn">
                Episodes
              </button>
            </div>
@@ -93,8 +92,26 @@ $searchForm.on("submit", async function (evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) { 
+  const episodesData = await axios.get(`https://api.tvmaze.com/shows/${id}/episodes`);
+  console.log(episodesData);
+}
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) { }
+
+async function clickCallBack(evt) {
+  evt.preventDefault();
+
+  console.log(evt.target.parent);
+  console.log($(show).getAttribute('data-show-id'));
+  // await getEpisodesOfShow(this.id);
+
+}
+
+
+$("#showsList").on("click", "#episodes-btn", clickCallBack);
+// when you push a button
+// use API to get episodes
+// display episodes in a list
