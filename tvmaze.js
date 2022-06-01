@@ -1,6 +1,7 @@
 "use strict";
 
 const TV_MAZE_SEARCH_URL = "https://api.tvmaze.com/search/shows?";
+const MISSING_IMAGE_REPLACEMENT = "https://tinyurl.com/tv-missing"; 
 
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
@@ -14,37 +15,29 @@ const searchTerm = $("#searchForm-term").val();
  *    (if no image URL given by API, put in a default image URL)
  */
 
-// use keyword, to match name of show
-// pull information for show
-// append and display on html
-
 async function getShowsByTerm(keyword) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
 
-  const axiosObj = await axios.get(TV_MAZE_SEARCH_URL, { params: { q: keyword } });
-
-  return axiosObj.data.map(idx => getShowInformation(idx));
+  const searchResults = await axios.get(TV_MAZE_SEARCH_URL, { params: { q: keyword } });
+  const showList = searchResults.data;
+  return showList.map(show => getShowInformation(show));
 }
 
+/** Gets information for an individual show from the axios object that is pulled from the keyword.
+ * returns an information (id, name, summary, image) stored as an object.
+ */
 function getShowInformation(show) {
 
   const showID = show.show.id
   const showName = show.show.name;
-  const showSummary = show.show.summary;
-  let showImage;
-
-  if (show.show.image === undefined) {
-    showImage = "https://tinyurl.com/tv-missing";
-  } else {
-    showImage = show.show.image.original;
-  }
+  let showSummary = (show.show.summary === null) ? "No Summary found": show.show.summary;
+  let showImage = (show.show.image === null) ? MISSING_IMAGE_REPLACEMENT: show.show.image.medium;
 
   return {
-    id: showID,
-    name: showName,
-    summary: showSummary,
-    image: showImage
-  }
+    "id": showID,
+    "name": showName,
+    "summary": showSummary,
+    "image": showImage
+  };
 
 }
 
