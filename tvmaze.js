@@ -88,30 +88,62 @@ $searchForm.on("submit", async function (evt) {
 });
 
 
+function getEpisodeInformation(episode) {
+
+  const episodeID = episode.id;
+  const episodeName = episode.name;
+  let episodeSeason = episode.season; 
+  let episodeNumber = episode.number; 
+
+  return {
+    "id": episodeID,
+    "name": episodeName,
+    "season": episodeSeason,
+    "number": episodeNumber
+  };
+
+}
+
+
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
 
 async function getEpisodesOfShow(id) { 
   const episodesData = await axios.get(`https://api.tvmaze.com/shows/${id}/episodes`);
-  console.log(episodesData);
+  let episodeList = episodesData.data;
+  return episodeList.map(episode => getEpisodeInformation(episode));
 }
 
 /** Write a clear docstring for this function... */
 
-function populateEpisodes(episodes) { }
-
-async function clickCallBack(evt) {
-  evt.preventDefault();
-
-  console.log(evt.target.parent);
-  console.log($(show).getAttribute('data-show-id'));
+function populateEpisodes(episodes) { 
+  for (let episode of episodes){
+    $("#episodesList").append(`<li>${episode.name}, season:${episode.season}, episode: ${episode.number}</li>`)
+  }
+}
+/*
+function clickCallBack(evt) {
+  let $button = $(evt.target);
+  let showId = $button.closest(".Show")[0].dataset.showId;
+  console.log(showId);
+  await getEpisodesOfShow(showId);
+  //console.log($(show).getAttribute('data-show-id'));
   // await getEpisodesOfShow(this.id);
+}*/
 
+async function displayEpisodes(id){
+  const episodes = await getEpisodesOfShow(id);
+  $episodesArea.show();
+  populateEpisodes(episodes);
 }
 
+$("#showsList").on("click", "#episodes-btn", async function(e){
+  let $button = $(e.target);
+  let showId = $button.closest(".Show")[0].dataset.showId;
 
-$("#showsList").on("click", "#episodes-btn", clickCallBack);
+  await displayEpisodes(showId);
+});
 // when you push a button
 // use API to get episodes
 // display episodes in a list
